@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Léandre Godet - Développeur informatique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14161c;
+    --bg-alt: #1b1e26;
+    --surface: #20242e;
+    --line: #2c313d;
+    --ink: #e9e6dc;
+    --ink-dim: #9aa2b1;
+    --gold: #cf9f4f;
+    --gold-soft: rgba(207,159,79,.14);
+    --teal: #5fb3a8;
+    --max: 980px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--gold-soft); color:var(--gold);}
+  a{color:inherit;}
+
+  /* subtle chessboard texture */
+  .board-texture{
+    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.05;
+    background-image:
+      linear-gradient(45deg, var(--ink) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--ink) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--ink) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--ink) 75%);
+    background-size:64px 64px;
+    background-position:0 0, 0 32px, 32px -32px, -32px 0px;
+  }
+
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 28px; position:relative; z-index:1;}
+
+  /* NAV */
+  nav{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter:blur(10px);
+    background:rgba(20,22,28,.75);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; padding:16px 28px;}
+  .nav-name{font-family:'JetBrains Mono', monospace; font-size:14px; letter-spacing:.02em; color:var(--gold);}
+  .nav-links{display:flex; gap:28px; list-style:none; margin:0; padding:0; font-size:14px;}
+  .nav-links a{text-decoration:none; color:var(--ink-dim); transition:color .2s;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links{display:none;}
+  @media(min-width:720px){ .nav-links{display:flex;} }
+
+  /* HERO */
+  .hero{
+    padding:120px 0 90px;
+    position:relative;
+  }
+  .move-tag{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px; color:var(--gold);
+    border:1px solid var(--gold-soft);
+    background:var(--gold-soft);
+    padding:6px 14px; border-radius:100px;
+    margin-bottom:28px;
+  }
+  .move-tag .dot{width:6px; height:6px; border-radius:50%; background:var(--gold);}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(2.6rem, 6vw, 4.6rem);
+    line-height:1.03;
+    margin:0 0 18px;
+    letter-spacing:-.01em;
+  }
+  h1 em{font-style:italic; color:var(--gold); font-weight:500;}
+  .lede{
+    font-size:clamp(1.05rem, 1.6vw, 1.25rem);
+    color:var(--ink-dim);
+    max-width:640px;
+    margin:0 0 36px;
+  }
+  .hero-meta{
+    display:flex; flex-wrap:wrap; gap:14px 28px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px; color:var(--ink-dim);
+    border-top:1px solid var(--line);
+    padding-top:26px;
+  }
+  .hero-meta span{display:flex; align-items:center; gap:8px;}
+  .hero-meta strong{color:var(--ink); font-weight:500;}
+  .hero-links{display:flex; gap:16px; margin-top:30px;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:11px 20px; border-radius:6px;
+    font-size:14px; font-weight:500; text-decoration:none;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
+    border:1px solid var(--line);
+  }
+  .btn-primary{background:var(--gold); color:#161822; border-color:var(--gold);}
+  .btn-primary:hover{transform:translateY(-1px); background:#ddb567;}
+  .btn-ghost{color:var(--ink); }
+  .btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-1px);}
+
+  /* SECTIONS */
+  section{padding:88px 0; border-top:1px solid var(--line); position:relative;}
+  .section-head{display:flex; align-items:baseline; gap:16px; margin-bottom:48px; flex-wrap:wrap;}
+  .section-move{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px; color:var(--gold);
+    white-space:nowrap;
+  }
+  .section-title{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(1.6rem, 3vw, 2.1rem);
+    margin:0;
+  }
+  .section-sub{color:var(--ink-dim); font-size:15px; margin-top:6px; max-width:600px;}
+
+  /* SKILLS */
+  .skills-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:28px;}
+  .skill-card{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:24px;}
+  .skill-card h3{
+    font-family:'JetBrains Mono', monospace; font-size:12px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--teal); margin:0 0 16px;
+  }
+  .chip-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    font-size:13px; padding:5px 11px; border-radius:100px;
+    background:var(--bg-alt); border:1px solid var(--line); color:var(--ink);
+  }
+  .lang-row{display:flex; justify-content:space-between; font-size:14px; padding:6px 0; border-bottom:1px dashed var(--line);}
+  .lang-row:last-child{border-bottom:none;}
+  .lang-row b{color:var(--gold); font-weight:600; font-family:'JetBrains Mono',monospace; font-size:12px;}
+
+  /* EXPERIENCE TIMELINE */
+  .timeline{border-left:1px solid var(--line); margin-left:4px;}
+  .tl-item{position:relative; padding:0 0 44px 32px;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-item::before{
+    content:''; position:absolute; left:-5px; top:4px;
+    width:9px; height:9px; border-radius:50%;
+    background:var(--gold); box-shadow:0 0 0 4px var(--bg);
+  }
+  .tl-date{font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--teal); margin-bottom:6px; display:block;}
+  .tl-role{font-family:'Fraunces', serif; font-size:1.3rem; margin:0 0 4px; font-weight:500;}
+  .tl-org{color:var(--ink-dim); font-size:14px; margin-bottom:12px; display:block;}
+  .tl-desc{color:var(--ink); font-size:15px; max-width:640px; margin-bottom:14px;}
+  .tl-link{
+    font-size:13px; font-family:'JetBrains Mono', monospace; color:var(--gold);
+    text-decoration:none; border-bottom:1px solid var(--gold-soft); padding-bottom:2px;
+  }
+  .tl-link:hover{border-color:var(--gold);}
+  .tl-note{font-size:12.5px; color:var(--ink-dim); font-style:italic; margin-top:6px;}
+  .tl-highlights{list-style:none; padding:0; margin:0 0 14px; display:grid; gap:8px;}
+  .tl-highlights li{font-size:14px; color:var(--ink); padding-left:16px; position:relative;}
+  .tl-highlights li::before{content:'—'; position:absolute; left:0; color:var(--gold);}
+  .tl-highlights b{color:var(--gold); font-weight:600;}
+  .mini-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:14px; margin:10px 0 16px;}
+  .mini-card{background:var(--bg-alt); border:1px solid var(--line); border-radius:8px; padding:16px;}
+  .mini-card h4{margin:0 0 6px; font-size:14.5px; font-family:'Fraunces', serif; font-weight:500; color:var(--ink);}
+  .mini-card p{margin:0; font-size:13px; color:var(--ink-dim); line-height:1.55;}
+  .mini-card .mini-tags{margin-top:8px; display:flex; flex-wrap:wrap; gap:5px;}
+  .mini-card .mini-tags span{font-size:10.5px; padding:2px 8px; border-radius:100px; background:var(--surface); border:1px solid var(--line); color:var(--teal);}
+
+  /* PROJECTS */
+  .projects{display:grid; gap:24px;}
+  .project{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:32px; display:grid; gap:18px;
+  }
+  .project.featured{border-color:var(--gold-soft); background:linear-gradient(160deg, var(--surface), var(--bg-alt));}
+  .project-head{display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;}
+  .project-title{font-family:'Fraunces', serif; font-size:1.5rem; margin:0; font-weight:500;}
+  .project-meta{font-size:12.5px; color:var(--ink-dim); font-family:'JetBrains Mono',monospace;}
+  .project-desc{color:var(--ink); font-size:15px; max-width:680px;}
+  .stat-row{display:flex; gap:24px; flex-wrap:wrap; padding:16px 0; border-top:1px dashed var(--line); border-bottom:1px dashed var(--line);}
+  .stat{display:flex; flex-direction:column;}
+  .stat b{font-family:'Fraunces', serif; font-size:1.6rem; color:var(--gold); font-weight:500;}
+  .stat span{font-size:12px; color:var(--ink-dim);}
+  .project-footer{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;}
+
+  /* EDUCATION */
+  .edu-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:24px;}
+  .edu-card{padding:28px; border:1px solid var(--line); border-radius:10px; background:var(--surface);}
+  .edu-card h3{font-family:'Fraunces', serif; font-weight:500; font-size:1.25rem; margin:0 0 4px;}
+  .edu-card .period{font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--teal); margin-bottom:12px; display:block;}
+  .edu-card p{font-size:14.5px; color:var(--ink-dim); margin:0;}
+
+  /* CONTACT */
+  .contact-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:48px;}
+  @media(max-width:720px){ .contact-grid{grid-template-columns:1fr;} }
+  .contact-list{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:16px;}
+  .contact-list a{text-decoration:none; display:flex; align-items:center; gap:12px; font-size:15px; transition:color .2s;}
+  .contact-list a:hover{color:var(--gold);}
+  .icon{width:18px; height:18px; flex-shrink:0; opacity:.8;}
+  .side-title{font-family:'JetBrains Mono', monospace; font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--teal); margin:0 0 14px;}
+  .interest-list, .commit-list{list-style:none; padding:0; margin:0 0 28px; font-size:14px; color:var(--ink-dim);}
+  .interest-list li, .commit-list li{padding:6px 0; border-bottom:1px dashed var(--line);}
+  .interest-list li:last-child, .commit-list li:last-child{border-bottom:none;}
+  .commit-list b{color:var(--ink); font-weight:500;}
+
+  footer{padding:40px 0; text-align:center; font-size:13px; color:var(--ink-dim); font-family:'JetBrains Mono', monospace;}
+  footer .move-final{color:var(--gold);}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<div class="board-texture"></div>
+
+<nav>
+  <div class="wrap">
+    <span class="nav-name">L. GODET</span>
+    <ul class="nav-links">
+      <li><a href="#competences">Compétences</a></li>
+      <li><a href="#experience">Expérience</a></li>
+      <li><a href="#projets">Projets</a></li>
+      <li><a href="#formation">Formation</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="move-tag"><span class="dot"></span>1. e4 - ouverture</div>
+    <h1>Léandre Godet<br><em>Développeur informatique</em>, fullstack à tendance backend.</h1>
+    <p class="lede">Étudiant en 5<sup>e</sup> année à Epitech Bordeaux (Titre RNCP niveau 7), disponible à partir d'octobre 2026. J'aime construire des systèmes fiables, du conteneur DevOps à l'API qui tient la charge, avec la même rigueur qu'aux échecs&nbsp;: chaque pièce a un rôle, chaque coup se prépare.</p>
+    <div class="hero-links">
+      <a class="btn btn-primary" href="mailto:leandre.godet@epitech.eu">Me contacter</a>
+      <a class="btn btn-ghost" href="#experience">Voir le parcours ↓</a>
+    </div>
+    <div class="hero-meta">
+      <span>📍 <strong>Reims</strong>, France</span>
+      <span>🚗 Permis B</span>
+      <span>🗓️ Disponible <strong>oct. 2026</strong></span>
+      <span>🌐 FR (C2) · EN (C1) · ES (B1)</span>
+    </div>
+  </div>
+</header>
+
+<section id="competences">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-move">1... e5</span>
+      <div>
+        <h2 class="section-title">Compétences</h2>
+        <p class="section-sub">La boîte à outils : des langages bas niveau aux pipelines qui livrent le code.</p>
+      </div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <h3>Langages</h3>
+        <div class="chip-row">
+          <span class="chip">C</span><span class="chip">C#</span><span class="chip">C++</span>
+          <span class="chip">Python</span><span class="chip">Java</span><span class="chip">Shell</span>
+          <span class="chip">PHP</span><span class="chip">React</span><span class="chip">Node.js</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3>DevOps</h3>
+        <div class="chip-row">
+          <span class="chip">Git</span><span class="chip">Docker</span><span class="chip">Podman</span>
+          <span class="chip">Jenkins</span><span class="chip">Ansible</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3>Environnement</h3>
+        <div class="chip-row">
+          <span class="chip">Linux</span><span class="chip">VS Code</span><span class="chip">Jira</span><span class="chip">GitHub Projects</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3>Langues</h3>
+        <div class="lang-row"><span>Français</span><b>C2</b></div>
+        <div class="lang-row"><span>Anglais</span><b>C1</b></div>
+        <div class="lang-row"><span>Espagnol</span><b>B1</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-move">2. Nf3</span>
+      <div>
+        <h2 class="section-title">Expérience professionnelle</h2>
+        <p class="section-sub">Trois stages, trois terrains différents : infrastructure, low-code métier, et géomatique territoriale.</p>
+      </div>
+    </div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <span class="tl-date">16/03/2026 - 18/09/2026</span>
+        <h3 class="tl-role">Stagiaire Géomatique</h3>
+        <span class="tl-org">PETR du Pays de Bray · service ADT/OTTEC</span>
+        <p class="tl-desc">Six mois en autonomie croissante au service Observatoire Territorial pour la Transition Écologique et Climatique (OTTEC), à cheval entre géomatique (QGIS) et développement logiciel, de l'automatisation de cartes interactives à un chatbot territorial.</p>
+        <ul class="tl-highlights">
+          <li><b>EDP (Éditeur de Projet)</b> : application Python/Tkinter de <b>37 fichiers (~25 000 lignes)</b> pour modifier automatiquement les cartes interactives exportées de QGIS (ajout/suppression de couches, style, traduction), documentée avec Sphinx pour la maintenance future.</li>
+          <li><b>Atlas électoral</b> : application web affichant élus et conseils municipaux par commune à partir de fichiers CSV, avec double carte interactive.</li>
+          <li><b>Dashboard OTTEC</b> : tableau de bord agrégeant des données démographiques, économiques et territoriales via les API INSEE (Melodi), Géorisques et Ecolab, avec export PDF pour accélérer le diagnostic territorial (habituellement ~1 an de travail).</li>
+          <li><b>BrayIA</b> : prototype de chatbot administratif&nbsp;; tests d'hébergement local (Ollama, Mistral, Qwen) puis recommandation d'un service IA hébergé après évaluation coût/fiabilité.</li>
+          <li><b>Mediatech</b> : application Python/Qt de <b>20 fichiers (~7 500 lignes)</b> pour taguer et organiser une photothèque partagée par 7 collaborateurs.</li>
+          <li><b>OBU</b> : automatisation budgétaire, d'abord en macros Excel VBA puis migrée vers une application Python complète (organigramme, plan comptable M57, export).</li>
+        </ul>
+        <a class="tl-link" href="rapport_stage_petr_2026.pdf" target="_blank" rel="noopener">↗ Rapport de stage complet</a>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-date">05/02/2024 - 07/06/2024</span>
+        <h3 class="tl-role">Stagiaire LowCode</h3>
+        <span class="tl-org">Groupe Ponticelli Frères · agence Grand Ouest, Bassens</span>
+        <p class="tl-desc">Au sein d'un binôme informatique de 2 personnes, développement d'une application <b>Microsoft Power Apps</b> pour le service Q3SE (Qualité, Sécurité, Sûreté, Environnement), destinée à remplacer des formulaires papier sur chantiers et ateliers.</p>
+        <ul class="tl-highlights">
+          <li>Application découpée en <b>8 modules</b>, pensée pour fonctionner hors-connexion sur le terrain avec synchronisation automatique vers <b>SharePoint</b> dès qu'un réseau est disponible, et une interface responsive pour s'adapter à tous les terminaux.</li>
+          <li>Mise en place de flux d'approbation avec <b>Power Automate</b>, déclenchés à la création d'un enregistrement SharePoint.</li>
+          <li>Cycle de développement itératif&nbsp;: chaque nouvelle fonctionnalité testée et validée par le tuteur avant la suivante.</li>
+        </ul>
+        <a class="tl-link" href="rapport_stage_ponticelli_2024.pdf" target="_blank" rel="noopener">↗ Rapport de stage complet</a>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-date">janv. 2024 - févr. 2024 · 2 semaines</span>
+        <h3 class="tl-role">Accompagnement pédagogique</h3>
+        <span class="tl-org">ISCC - ISEG Code Camp · CDD</span>
+        <p class="tl-desc">Accompagnement pédagogique d'apprenants dans le cadre de l'ISCC (ISEG Code Camp), en parallèle de la formation à Epitech.</p>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-date">01/08/2022 - 31/12/2022</span>
+        <h3 class="tl-role">Stagiaire DevOps</h3>
+        <span class="tl-org">ISIA (groupe Elcia) · Juillan</span>
+        <p class="tl-desc">Mission de conteneurisation de <b>Diapason</b>, l'ERP sur-mesure destiné aux fabricants de menuiserie (n°1 français du secteur), pour fiabiliser et accélérer son déploiement chez les clients.</p>
+        <ul class="tl-highlights">
+          <li>Étude comparative <b>Docker vs. la suite Red Hat</b> (Podman, Buildah, Skopeo)&nbsp;; choix de cette dernière pour son fonctionnement non privilégié, plus sûr pour un déploiement chez les clients, et sa compatibilité avec RHEL/CentOS.</li>
+          <li>Conteneurisation de la partie serveur (Unix/SAP) de Diapason, puis <b>automatisation en scripts Bash</b> capables d'installer n'importe quelle révision de la version 04.16 (soit 15 révisions).</li>
+          <li>Déploiement testé avec succès sur plusieurs machines virtuelles internes, puis mis à disposition des équipes de test.</li>
+          <li>Présentation du fonctionnement des containers Diapason à l'ensemble d'ISIA, aux côtés du tuteur de stage.</li>
+        </ul>
+        <a class="tl-link" href="rapport_stage_elcia_2022.pdf" target="_blank" rel="noopener">↗ Rapport de stage complet</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="projets">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-move">2... Nc6</span>
+      <div>
+        <h2 class="section-title">Projets académiques</h2>
+        <p class="section-sub">Ce qui reste quand on ferme le cahier des charges&nbsp;: du code qui tourne, testé, documenté.</p>
+      </div>
+    </div>
+
+    <div class="projects">
+
+      <div class="project featured">
+        <div class="project-head">
+          <div>
+            <h3 class="project-title">Smart Waste Sorting Application</h3>
+            <span class="project-meta">Roskilde University · Danemark · Printemps 2025 · avec Sabin Ghimire</span>
+          </div>
+          <a class="btn btn-ghost" href="https://rucforsk.ruc.dk/ws/files/111387685/A_smart_waste_sorting_application.pdf" target="_blank" rel="noopener">↗ Lire le rapport</a>
+        </div>
+        <p class="project-desc">Application Android de tri des déchets par intelligence artificielle, développée pendant l'échange universitaire au Danemark. Une image de déchet est capturée via la caméra du téléphone, envoyée à un backend Node.js/Express qui interroge le modèle GPT-4o mini d'OpenAI pour classifier l'objet en 5 catégories (plastique, papier, métal, verre, organique), avec journalisation des résultats dans une base SQLite.</p>
+        <div class="stat-row">
+          <div class="stat"><b>96%</b><span>précision globale sur 50 tests</span></div>
+          <div class="stat"><b>3,17s</b><span>temps de réponse moyen</span></div>
+          <div class="stat"><b>5</b><span>catégories de déchets</span></div>
+        </div>
+        <div class="project-footer">
+          <div class="chip-row">
+            <span class="chip">React Native</span><span class="chip">Expo</span><span class="chip">Node.js</span>
+            <span class="chip">Express</span><span class="chip">SQLite</span><span class="chip">OpenAI GPT-4o mini</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="project-head">
+          <div>
+            <h3 class="project-title">R-Type</h3>
+            <span class="project-meta">Epitech · Groupe de 6 · sept. 2021 - août 2024</span>
+          </div>
+        </div>
+        <p class="project-desc">Jeu de tir en réseau façon R-Type, revisité dans un univers cyberpunk, développé en C++ avec une architecture client-serveur.</p>
+        <div class="chip-row">
+          <span class="chip">C++</span><span class="chip">Réseau</span><span class="chip">Jeu vidéo</span>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="project-head">
+          <div>
+            <h3 class="project-title">Area</h3>
+            <span class="project-meta">Epitech · Groupe de 5 · sept. 2021 - août 2024</span>
+          </div>
+        </div>
+        <p class="project-desc">Site web et application mobile type IFTTT, permettant d'enchaîner des actions automatisées entre différents services (« si ceci, alors cela »).</p>
+        <div class="chip-row">
+          <span class="chip">PHP</span><span class="chip">MariaDB</span><span class="chip">Vue.js</span><span class="chip">React Native</span>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="project-head">
+          <div>
+            <h3 class="project-title">Zappy</h3>
+            <span class="project-meta">Epitech · Groupe de 7 · sept. 2021 - août 2024</span>
+          </div>
+        </div>
+        <p class="project-desc">Jeu de stratégie en réseau se déroulant dans le monde de Trantor, avec serveur, IA client et interface graphique développés séparément par l'équipe.</p>
+        <div class="chip-row">
+          <span class="chip">C</span><span class="chip">C++</span><span class="chip">Python</span><span class="chip">Réseau</span>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="project-head">
+          <div>
+            <h3 class="project-title">my_sokoban</h3>
+            <span class="project-meta">Epitech · Projet individuel · sept. 2021 - août 2024</span>
+          </div>
+        </div>
+        <p class="project-desc">Implémentation du jeu de réflexion Sokoban jouable directement dans un terminal.</p>
+        <div class="chip-row">
+          <span class="chip">C</span><span class="chip">Terminal</span>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="project-head">
+          <div>
+            <h3 class="project-title">EpiGimp2.0</h3>
+            <span class="project-meta">Epitech · Projet en binôme · 5 mois · Méthodologie agile</span>
+          </div>
+        </div>
+        <p class="project-desc">Recréation d'un logiciel d'édition d'image inspiré de GIMP, en C++ avec la bibliothèque graphique Qt. Développé en équipe de 2 sur un cycle agile de 5 mois.</p>
+        <div class="chip-row">
+          <span class="chip">C++</span><span class="chip">Qt</span><span class="chip">Agile</span>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="project-head">
+          <div>
+            <h3 class="project-title">SunChaser</h3>
+            <span class="project-meta">Epitech · Projet en groupe de 4 · 2 ans</span>
+          </div>
+        </div>
+        <p class="project-desc">Jeu vidéo de sensibilisation à l'environnement, conçu et développé sur deux ans avec le moteur Godot, en équipe de 4.</p>
+        <div class="chip-row">
+          <span class="chip">Godot Engine</span><span class="chip">Game Design</span><span class="chip">Travail d'équipe</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="formation">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-move">3. Bb5</span>
+      <div>
+        <h2 class="section-title">Formation</h2>
+        <p class="section-sub">Un cursus solide, avec une ouverture à l'international.</p>
+      </div>
+    </div>
+    <div class="edu-grid">
+      <div class="edu-card">
+        <h3>Epitech</h3>
+        <span class="period">2021 - 2026</span>
+        <p>BAC+5 · Expert en ingénierie logicielle - Titre RNCP niveau 7.</p>
+      </div>
+      <div class="edu-card">
+        <h3>Roskilde University</h3>
+        <span class="period">2024 - 2025</span>
+        <p>Échange universitaire d'un an au Danemark, incluant le projet « Smart Waste Sorting Application ».</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-move">3... a6</span>
+      <div>
+        <h2 class="section-title">Contact & engagements</h2>
+        <p class="section-sub">La partie continue : n'hésitez pas à me contacter.</p>
+      </div>
+    </div>
+    <div class="contact-grid">
+      <div>
+        <ul class="contact-list">
+          <li><a href="mailto:leandre.godet@epitech.eu">✉️ leandre.godet@epitech.eu</a></li>
+          <li><a href="tel:+33689954269">📞 06 89 95 42 69</a></li>
+          <li><a href="https://github.com/Leandre17">🔗 GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/leandre-godet/">💼 LinkedIn</a></li>
+          <li><span>📍 Reims, France · Permis B</span></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="side-title">Engagements extra-professionnels</h4>
+        <ul class="commit-list">
+          <li><b>Coding Club Bordeaux</b> - Animateur informatique auprès de jeune public · 2021–2022</li>
+          <li><b>Association E-mma</b> - Assistant communication · 2023–2024</li>
+        </ul>
+        <h4 class="side-title">Centres d'intérêt</h4>
+        <ul class="interest-list">
+          <li>Échecs (compétition), informatique et mathématiques - logique et réflexion</li>
+          <li>Golf et tir à l'arc (compétition) - performance et précision</li>
+          <li>Découverte et aventure - voyages</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="move-final">1–0</span>, merci d'avoir joué la partie jusqu'au bout.
+</footer>
+
+</body>
+</html>
